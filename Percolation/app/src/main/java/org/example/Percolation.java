@@ -9,35 +9,64 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 public class Percolation {
 
     private WeightedQuickUnionUF quickUnion;
+    private int n;
+    private boolean[] isOpenArr;
+    private int numOpen;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
-        quickUnion = new WeightedQuickUnionUF(n*n);
+        this.n = n;
+        // Adds 2 extra sites as virtual sites on the top and bottom of grid
+        this.quickUnion = new WeightedQuickUnionUF((n*n) + 2);
+        this.isOpenArr = new boolean[n];
+        this.numOpen = 0;
+    }
+
+    private int coordToN(int row, int col) {
+        return ((row - 1) * n) + col + 1; 
     }
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col){
-
-    }
+        // Unions site to all adjacent sites
+        this.quickUnion.union(coordToN(row-1, col), coordToN(row, col));
+        this.quickUnion.union(coordToN(row, col-1), coordToN(row, col));
+        this.quickUnion.union(coordToN(row+1, col), coordToN(row, col));
+        this.quickUnion.union(coordToN(row, col+1), coordToN(row, col));
+        this.isOpenArr[coordToN(row, col)] = true;
+        this.numOpen++;
+        }
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col){
-
+        return this.isOpenArr[coordToN(row, col)];
     }
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col){
+        // int[] arr = {-1,1};
+        // for(int i=0; i < arr.length; i++){
+        //     if(this.quickUnion.find(coordToN(row, col)) != this.quickUnion.find(coordToN(row+arr[i], col))){
+        //         return true;
+        //     }
+        //     if(this.quickUnion.find(coordToN(row, col)) != this.quickUnion.find(coordToN(row, col+arr[i]))){
+        //         return true;
+        //     }
+
+        // }
+        // return false;
+        return !this.isOpenArr[coordToN(row, col)];
 
     }
 
     // returns the number of open sites
     public int numberOfOpenSites(){
-
+        return this.numOpen;
     }
 
     // does the system percolate?
     public boolean percolates(){
-
+        return (this.quickUnion.find(0) == this.quickUnion.find(this.n+1));
     }
 
     // test client (optional)
