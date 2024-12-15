@@ -25,7 +25,7 @@ public class Percolation {
         // Union virtual top and bottom sites to top and bottom rows
         for(int col=1;col <= this.n; col++) {
             this.quickUnion.union(0, col);
-            this.quickUnion.union(n+1, n*(n-1) + col);
+            this.quickUnion.union((n*n)+1, n*(n-1) + col);
         }
     }
 
@@ -49,8 +49,8 @@ public class Percolation {
         if(col < this.n) {
             this.quickUnion.union(coordToN(row, col+1), coordToN(row, col));
         }
-        this.isOpenArr[coordToN(row, col)] = true;
-        this.numOpen += 1;
+        this.isOpenArr[coordToN(row, col)-1] = true;
+        this.numOpen++;
         }
 
     // is the site (row, col) open?
@@ -82,7 +82,7 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates(){
-        return (this.quickUnion.find(0) == this.quickUnion.find(this.n+1));
+        return (this.quickUnion.find(0) == this.quickUnion.find((this.n*this.n)+1));
     }
 
     // test client (optional)
@@ -93,9 +93,9 @@ public class Percolation {
         // }
         // int n = Integer.parseInt(args[0]);
         // int T = Integer.parseInt(args[1]);
-        int n = 20;
-        int T = 20;
-        int[] numOpenToPercolate = new int[T];
+        int n = 100;
+        int T = 100;
+        double[] numOpenToPercolate = new double[T];
         // for(int i=0;i<1001;i++){
         //     int randNum = StdRandom.uniformInt(1, n);
         //     System.out.printf("%d\n",randNum);
@@ -112,7 +112,7 @@ public class Percolation {
                     percolationClient.open(StdRandom.uniformInt(1, n), StdRandom.uniformInt(1, n));
                     percolates = percolationClient.percolates();
                     if(percolates){
-                        numOpenToPercolate[i] = percolationClient.numberOfOpenSites();
+                        numOpenToPercolate[i] = percolationClient.numberOfOpenSites()/(double)(n*n);
                         break;
                     }
                 }
