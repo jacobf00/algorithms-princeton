@@ -17,6 +17,9 @@ public class Percolation {
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
+        if(n <= 0) {
+            throw new IllegalArgumentException("n needs to be > 0");
+        }
         this.n = n;
         // Adds 2 extra sites as virtual sites on the top and bottom of grid
         this.quickUnion = new WeightedQuickUnionUF((n*n) + 2);
@@ -31,6 +34,9 @@ public class Percolation {
 
     public int coordToN(int row, int col) {
         // Converts row, col to position n in array accounting for virtual sites at beginning and end
+        if(row < 1 || row > this.n || col < 1 || col > this.n){
+            throw new IllegalArgumentException("The (row, col) indices are out of the bounds [1,n]");
+        }
         return ((row-1) * this.n) + col;
     }
 
@@ -63,18 +69,7 @@ public class Percolation {
 
     // is the site (row, col) full?
     public boolean isFull(int row, int col){
-        // int[] arr = {-1,1};
-        // for(int i=0; i < arr.length; i++){
-        //     if(this.quickUnion.find(coordToN(row, col)) != this.quickUnion.find(coordToN(row+arr[i], col))){
-        //         return true;
-        //     }
-        //     if(this.quickUnion.find(coordToN(row, col)) != this.quickUnion.find(coordToN(row, col+arr[i]))){
-        //         return true;
-        //     }
-
-        // }
-        // return false;
-        return !this.isOpenArr[coordToN(row, col)];
+        return !this.isOpenArr[coordToN(row, col)-1];
 
     }
 
@@ -99,13 +94,6 @@ public class Percolation {
         int n = 100;
         int T = 1000;
         double[] numOpenToPercolate = new double[T];
-        // for(int i=0;i<1001;i++){
-        //     int randNum = StdRandom.uniformInt(1, n);
-        //     System.out.printf("%d\n",randNum);
-        //     if(randNum == 0){
-        //         System.out.println("Error!");
-        //     }
-        // }
 
         for(int i=0; i < T; i++){
             Percolation percolationClient = new Percolation(n);
@@ -114,12 +102,9 @@ public class Percolation {
                 percolationClient.open(StdRandom.uniformInt(1, n+1), StdRandom.uniformInt(1, n+1));
                 percolates = percolationClient.percolates();
                 if(percolates){
-                    // System.out.println("Foo");
                     numOpenToPercolate[i] = percolationClient.numberOfOpenSites()/(double)(n*n);
                 }
             }
-            // System.out.println(percolationClient.numberOfOpenSites());
-            // System.out.println(percolates);
         }
         long endTime = System.currentTimeMillis() - startTime;
         System.out.printf("Percolation simulation took: %d ms\n", endTime);
