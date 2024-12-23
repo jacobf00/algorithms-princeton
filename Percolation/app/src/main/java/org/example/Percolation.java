@@ -36,17 +36,20 @@ public class Percolation {
 
     // opens the site (row, col) if it is not open already
     public void open(int row, int col){
+        if(this.isOpen(row, col)) {
+            return;
+        }
         // Unions site to all adjacent sites
-        if(row > 1) {
+        if(row > 1 && this.isOpen(row-1, col)) {
             this.quickUnion.union(coordToN(row-1, col), coordToN(row, col));
         }
-        if(col > 1) {
+        if(col > 1 && this.isOpen(row, col-1)) {
             this.quickUnion.union(coordToN(row, col-1), coordToN(row, col));
         }
-        if(row < this.n) {
+        if(row < this.n && this.isOpen(row+1, col)) {
             this.quickUnion.union(coordToN(row+1, col), coordToN(row, col));
         }
-        if(col < this.n) {
+        if(col < this.n && this.isOpen(row, col+1)) {
             this.quickUnion.union(coordToN(row, col+1), coordToN(row, col));
         }
         this.isOpenArr[coordToN(row, col)-1] = true;
@@ -55,7 +58,7 @@ public class Percolation {
 
     // is the site (row, col) open?
     public boolean isOpen(int row, int col){
-        return this.isOpenArr[coordToN(row, col)];
+        return this.isOpenArr[coordToN(row, col)-1];
     }
 
     // is the site (row, col) full?
@@ -94,7 +97,7 @@ public class Percolation {
         // int n = Integer.parseInt(args[0]);
         // int T = Integer.parseInt(args[1]);
         int n = 100;
-        int T = 100;
+        int T = 1000;
         double[] numOpenToPercolate = new double[T];
         // for(int i=0;i<1001;i++){
         //     int randNum = StdRandom.uniformInt(1, n);
@@ -107,19 +110,16 @@ public class Percolation {
         for(int i=0; i < T; i++){
             Percolation percolationClient = new Percolation(n);
             boolean percolates = false;
-            for(int row=1; row < n+1; row++) {
-                for(int col=1; col < n+1; col++){
-                    percolationClient.open(StdRandom.uniformInt(1, n), StdRandom.uniformInt(1, n));
-                    percolates = percolationClient.percolates();
-                    if(percolates){
-                        numOpenToPercolate[i] = percolationClient.numberOfOpenSites()/(double)(n*n);
-                        break;
-                    }
-                }
-                if(percolates) {
-                    break;
+            while(!percolates){
+                percolationClient.open(StdRandom.uniformInt(1, n+1), StdRandom.uniformInt(1, n+1));
+                percolates = percolationClient.percolates();
+                if(percolates){
+                    // System.out.println("Foo");
+                    numOpenToPercolate[i] = percolationClient.numberOfOpenSites()/(double)(n*n);
                 }
             }
+            // System.out.println(percolationClient.numberOfOpenSites());
+            // System.out.println(percolates);
         }
         long endTime = System.currentTimeMillis() - startTime;
         System.out.printf("Percolation simulation took: %d ms\n", endTime);
